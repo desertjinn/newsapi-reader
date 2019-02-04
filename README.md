@@ -1,3 +1,28 @@
+# News API - Reader
+
+## Introduction
+
+This is aimed to be a multi-platform reader for the content available on https://newsapi.org <br>
+The application is built using Electron and React.
+
+## Prerequisites for running/building from repository files
+
+1. NodeJs
+2. npm
+3. ReactJs
+4. Electron
+
+## Instructions
+
+1. To Build
+        * Run `npm preelectron-pack` and then `npm electron-pack`
+        * the runner files will be available in the `/dist` directory
+2. To Run
+        * Run `npm electron-dev`
+        * the application will run in a separate window as well as be available @ http://localhost:3000
+
+---
+
 ## Available Scripts
 
 In the project directory, you can run:
