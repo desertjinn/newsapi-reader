@@ -11,6 +11,7 @@ import Chip from '@material-ui/core/Chip';
 import SwitchWithLabel from './SwitchWithLabel';
 import isoLangs from './isolanguages';
 import countrycodes from './countrycodes';
+import NewsRetrievalType from './NewsRetrievalType';
 
 const NewsAPI = require('newsapi');
 const newsapi = new NewsAPI('5085ba8489714c3f9ebc9beb9aa16eb0');
@@ -20,7 +21,7 @@ const countryCodes = countrycodes();
 const styles = theme => ({
   root: {
     display: 'flex',
-    flexWrap: 'wrap',
+    flexWrap: 'wrap'
   },
   chips: {
     display: 'flex',
@@ -56,6 +57,8 @@ const MenuProps = {
 
 class Filter extends React.Component {
   state = {
+    id : this.props.id,
+    retrievalFunction: this.props.retrievalFunction,
     language: this.props.language,
     country: this.props.country,
     category: this.props.category,
@@ -126,8 +129,6 @@ class Filter extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    console.log("RECEIVING---");
-    console.log(nextProps);
     this.setState({ backgroundColor: nextProps.backgroundColor, color: nextProps.color });
   }
 
@@ -231,8 +232,7 @@ class Filter extends React.Component {
   render() {
     const { classes } = this.props;
     return (
-      <React.Fragment>
-      <div className={classes.formAlignment}>
+      <div className={classes.formAlignment} id={this.state.id} >
         <form className={classes.root} autoComplete="off">
           <FormControl className={classes.formControl}>
             <InputLabel htmlFor="source">Sources</InputLabel>
@@ -334,13 +334,16 @@ class Filter extends React.Component {
           </FormControl>
           <FormControl className={classes.formControl}>
             <SwitchWithLabel 
+              label="Headlines" 
+              onSwitchOn={ this.props.onSwitchToHeadlines } 
+              onSwitchOff={ this.props.onSwitchToEverything } />
+            <SwitchWithLabel 
               label="Dark" 
-              onSwitchToDarkMode={ this.props.onSwitchToDarkMode } 
-              onSwitchToLightMode={ this.props.onSwitchToLightMode } />
+              onSwitchOn={ this.props.onSwitchToDarkMode } 
+              onSwitchOff={ this.props.onSwitchToLightMode } />
           </FormControl>
         </form>
       </div>
-      </React.Fragment>
     );
   }
 }

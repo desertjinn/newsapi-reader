@@ -12,7 +12,6 @@ import Typography from '@material-ui/core/Typography';
 import red from '@material-ui/core/colors/red';
 import Button from '@material-ui/core/Button';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
-
 var dateFormat = require('dateformat');
 
 const styles = theme => ({
@@ -58,7 +57,9 @@ class News extends React.Component {
     image: this.props.image,
     author: this.props.author,
     content: this.props.content ,
-    description: this.props.description
+    description: this.props.description,
+    className: this.props.className,
+    details: false
   };
 
   handleExpandClick = () => {
@@ -73,37 +74,39 @@ class News extends React.Component {
     var date = dateFormat(this.state.date, "dddd, mmmm dS, yyyy, h:MM:ss TT");
 
     return (
-      <Card key={this.state.key} className={classes.card}>
-        <CardHeader
-          avatar={
-            <Avatar aria-label="News" className={classes.avatar}>
-              {avatar}
-            </Avatar>
-          }
-          action={
-            <IconButton>
-              <MoreVertIcon />
-            </IconButton>
-          }
-          title={this.state.title}
-          subheader={date}
-        />
-        <CardMedia
-          className={mediaClasses}
-          image={this.state.image}
-          title={this.state.title}
-        />
-        <CardContent>
-          <Typography component="p">
-            {this.state.description}
-          </Typography>
-        </CardContent>
-        <CardActions className={classes.actions} disableActionSpacing>
-          <Button size="small" color="primary">
-            Learn More
-          </Button>
-        </CardActions>
-      </Card>
+      <div className={this.state.className}>
+        <Card key={this.state.key} className={classes.card}>
+          <CardHeader
+            avatar={
+              <Avatar aria-label="News" className={classes.avatar}>
+                {avatar}
+              </Avatar>
+            }
+            action={
+              <IconButton>
+                <MoreVertIcon />
+              </IconButton>
+            }
+            title={this.state.title}
+            subheader={date}
+          />
+          <CardMedia
+            className={mediaClasses}
+            image={this.state.image}
+            title={this.state.title}
+          />
+          <CardContent>
+            <Typography component="p">
+              {this.state.description}
+            </Typography>
+          </CardContent>
+          <CardActions className={classes.actions} disableActionSpacing>
+            <Button size="small" color="primary" href={this.state.url} target="_blank">
+              View Article
+            </Button>
+          </CardActions>
+        </Card>
+      </div>
     );
   }
 }

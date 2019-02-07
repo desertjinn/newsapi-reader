@@ -6,16 +6,17 @@ const path = require('path');
 
 let mainWindow;
 function createWindow() {
-    mainWindow = new BrowserWindow({width: 900, height: 680});
+    mainWindow = new BrowserWindow({ width: 900, height: 680, minimizable: false,
+        maximizable: false, closable: true });
     // mainWindow.loadURL('http://localhost:3000');
     mainWindow.loadURL(isDev ? 
         'http://localhost:3000' 
         : `file://${path.join(__dirname, '../build/index.html')}`
     );
-    app.setAboutPanelOptions({
-        applicationName: "NewsApi Reader",
-        applicationVersion: "0.0.1",
-    })
+    // app.setAboutPanelOptions({
+    //     applicationName: "NewsApi Reader",
+    //     applicationVersion: "0.0.1",
+    // })
     mainWindow.on('closed', () => mainWindow = null);
 }
 app.on('ready', createWindow);

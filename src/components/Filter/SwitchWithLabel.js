@@ -5,15 +5,16 @@ import Switch from '@material-ui/core/Switch';
 
 class SwitchWithLabel extends React.Component {
   state = {
-    dark: false
+    switchOn: false,
+    switchLabel: this.props.label
   };
 
   handleChange = name => event => {
     this.setState({ [name]: event.target.checked });
     if (event.target.checked) {
-      this.props.onSwitchToDarkMode();
+      this.props.onSwitchOn();
     } else {
-      this.props.onSwitchToLightMode();
+      this.props.onSwitchOff();
     }
   }
 
@@ -23,12 +24,12 @@ class SwitchWithLabel extends React.Component {
         <FormControlLabel
           control={
             <Switch
-              checked={this.state.checkedA}
-              onChange={this.handleChange('dark')}
-              value="dark"
+              checked={this.state.switchOn}
+              onChange={this.handleChange('switchOn')}
+              value={this.state.switchLabel}
             />
           }
-          label="Dark"
+          label={this.state.switchLabel}
         />
       </FormGroup>
     );
