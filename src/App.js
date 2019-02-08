@@ -45,7 +45,12 @@ class App extends Component {
     totalHeight: 0,
     filterHeight: 0,
     contentHeight: 0,
-    searchQuery: null
+    searchQuery: "Today",
+    source: [],
+    language: [],
+    country: [],
+    category: []
+
   }
   constructor(props) {
     super(props);
@@ -53,6 +58,7 @@ class App extends Component {
     this.onSwitchToLightMode = this.onSwitchToLightMode.bind(this);
     this.onSwitchToHeadlines = this.onSwitchToHeadlines.bind(this);
     this.onSwitchToEverything = this.onSwitchToEverything.bind(this);
+    this.onChangeOfFilter = this.onChangeOfFilter.bind(this);
     this.updateDimensions = this.updateDimensions.bind(this);
     this.retrieveNewsApiData = this.retrieveNewsApiData.bind(this);
     this.generateNewsCards = this.generateNewsCards.bind(this);
@@ -62,7 +68,7 @@ class App extends Component {
 
   componentDidMount() {
     window.addEventListener("resize", this.updateDimensions);
-    this.retrieveNewsApiData();  
+    this.retrieveNewsApiData('Headlines');  
     this.updateDimensions();
   }
 
@@ -70,11 +76,20 @@ class App extends Component {
     window.removeEventListener("resize", this.updateDimensions);
   }
 
-  retrieveNewsApiData() {
+  retrieveNewsApiData(type) {
+    if (type) {
+      this.props.enqueueSnackbar(`Setting article retrieval to - "${type}"`, { 
+        variant: 'default',
+        autoHideDuration: 5000
+      });
+    }
+    
     newsapi.v2[this.state.retrievalFunction]({ 
-      'q': this.state.searchQuery ? this.state.searchQuery : 'today',
-      'sources' : '', // comma seperated list
-      'language' : '', // comma seperated list??
+      'q': this.state.searchQuery ? `${this.state.searchQuery}` : 'today',
+      'sources' : this.state.source && this.state.source.length ? `${this.state.source}` : '', // comma seperated list
+      'language' : this.state.language && this.state.language.length ? `${this.state.language}` : '', // comma seperated list??
+      'country' : this.state.country && this.state.country.length ? `${this.state.country}` : '', // comma seperated list??
+      'category' : this.state.category && this.state.category.length ? `${this.state.category}` : '', // comma seperated list??
       'domains' : '', // comma seperated list
       'excludeDomains' : '', // comma seperated list
       'from' : '', // e.g. 2019-02-07 or 2019-02-07T09:42:40
@@ -83,7 +98,7 @@ class App extends Component {
       'pageSize' : '20', // 20 is the default, 100 is the maximum.
       'page' : '1' // Use this to page through the results.
     }).then(response => {
-      this.props.enqueueSnackbar('Fetched articles from News API.', { 
+      this.props.enqueueSnackbar(`Refreshing articles...`, { 
         variant: 'success',
         autoHideDuration: 3000,
         // anchorOrigin: {
@@ -99,7 +114,7 @@ class App extends Component {
         });
       }
     }).catch(error => { 
-      this.props.enqueueSnackbar('Failed to fetch articles from News API.', { 
+      this.props.enqueueSnackbar(`Failed to refresh articles !`, { 
         variant: 'error',
         autoHideDuration: 3000
       });
@@ -126,44 +141,46 @@ class App extends Component {
   }
 
   onSwitchToDarkMode() {
-    document.body.className = this.props.classes.whiteOnBlack;
-    this.setState({ FilterTheme: "whiteOnBlack" });
-    this.props.enqueueSnackbar('Setting dark theme...', { 
-      variant: 'default',
+    this.props.enqueueSnackbar('Setting theme: Dark', { 
+      variant: 'info',
       autoHideDuration: 5000
     });
+    document.body.className = this.props.classes.whiteOnBlack;
+    this.setState({ FilterTheme: "whiteOnBlack" });
   }
 
   onSwitchToLightMode() {
-    document.body.className = this.props.classes.blackOnWhite;
-    this.setState({ FilterTheme: "blackOnWhite" });
-    this.props.enqueueSnackbar('Setting light theme...', { 
-      variant: 'default',
+    this.props.enqueueSnackbar('Setting theme: Light', { 
+      variant: 'info',
       autoHideDuration: 5000
     });
+    document.body.className = this.props.classes.blackOnWhite;
+    this.setState({ FilterTheme: "blackOnWhite" });
+    
   }
 
   onSwitchToHeadlines() {
-    this.setState({ retrievalFunction: "topHeadlines" });
-    this.retrieveNewsApiData();  
-    this.props.enqueueSnackbar('Setting news type as -"Headlines"', { 
-      variant: 'default',
-      autoHideDuration: 5000
+    this.setState({ retrievalFunction: 'topHeadlines' }, () => {
+      this.retrieveNewsApiData('Headlines');  
     });
   }
 
   onSwitchToEverything() {
-    this.setState({ retrievalFunction: "everything" });
-    this.retrieveNewsApiData();  
-    this.props.enqueueSnackbar('Setting news type as -"Everything"', { 
-      variant: 'default',
-      autoHideDuration: 5000
+    this.setState({ retrievalFunction: 'everything' }, () => {
+      this.retrieveNewsApiData('Everything');  
     });
   }
 
-  onChangeOfFilter(language, country, category, source) {
-    console.log("FILTER CHANGED!  ===>> ");
-    console.log(language, country, category, source);
+  onChangeOfFilter(language, country, category, source, search) {
+    this.setState({ 
+      language: language,
+      country: country,
+      category: category,
+      source: source,
+      searchQuery: search
+    }, () => {
+      this.retrieveNewsApiData();  
+    });
   }
 
   isEmpty(obj) {
@@ -182,6 +199,7 @@ class App extends Component {
         country={[""]} 
         category={[""]} 
         source={[""]} 
+        search={this.state.searchQuery}
         onSwitchToDarkMode={this.onSwitchToDarkMode} 
         onSwitchToLightMode={this.onSwitchToLightMode}
         onSwitchToHeadlines={this.onSwitchToHeadlines} 

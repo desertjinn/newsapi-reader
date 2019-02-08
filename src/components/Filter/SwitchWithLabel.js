@@ -3,37 +3,52 @@ import FormGroup from '@material-ui/core/FormGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
 
-class SwitchWithLabel extends React.Component {
+class SwitchesWithLabel extends React.Component {
   state = {
-    switchOn: false,
-    switchLabel: this.props.label
+    options: this.props.options
   };
 
-  handleChange = name => event => {
-    this.setState({ [name]: event.target.checked });
-    if (event.target.checked) {
-      this.props.onSwitchOn();
-    } else {
-      this.props.onSwitchOff();
-    }
+  constructor(props) {
+    super(props);
+    this.generateOptions = this.generateOptions.bind(this);
+  }
+
+  handleChange = label => event => {
+    this.state.options.map(option => {
+      if (option.label === label) {
+        option.on = event.target.checked;
+        if (event.target.checked) {
+          option.onSwitchOn();
+        } else {
+          option.onSwitchOff();
+        }
+      }
+      return option;
+    });
+  }
+
+  generateOptions() {
+    return this.state.options.map((option, key) => {
+      return <FormControlLabel 
+        key={'option_' + key} 
+        control={
+          <Switch
+            checked={option.on}
+            onChange={this.handleChange(option.label)}
+            value={option.label}
+          />
+        }
+        label={option.label}
+      />;
+    });
+    
   }
 
   render() {
     return (
-      <FormGroup row>
-        <FormControlLabel
-          control={
-            <Switch
-              checked={this.state.switchOn}
-              onChange={this.handleChange('switchOn')}
-              value={this.state.switchLabel}
-            />
-          }
-          label={this.state.switchLabel}
-        />
-      </FormGroup>
+      <FormGroup row>{ this.generateOptions() }</FormGroup>
     );
   }
 }
 
-export default SwitchWithLabel;
+export default SwitchesWithLabel;

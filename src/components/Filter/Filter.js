@@ -8,10 +8,10 @@ import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import Chip from '@material-ui/core/Chip';
-import SwitchWithLabel from './SwitchWithLabel';
+import TextField from '@material-ui/core/TextField';
+import SwitchesWithLabel from './SwitchWithLabel';
 import isoLangs from './isolanguages';
 import countrycodes from './countrycodes';
-import NewsRetrievalType from './NewsRetrievalType';
 
 const NewsAPI = require('newsapi');
 const newsapi = new NewsAPI('5085ba8489714c3f9ebc9beb9aa16eb0');
@@ -42,7 +42,12 @@ const styles = theme => ({
   },
   selectEmpty: {
     marginTop: theme.spacing.unit * 2,
-  }
+  },
+  textField: {
+    marginLeft: theme.spacing.unit,
+    marginRight: theme.spacing.unit,
+    width: 200,
+  },
 });
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -63,6 +68,7 @@ class Filter extends React.Component {
     country: this.props.country,
     category: this.props.category,
     source: this.props.source,
+    search: this.props.search,
     sources: [],
     languages: [],
     countries: [],
@@ -137,8 +143,18 @@ class Filter extends React.Component {
       var filteredValue = event.target.value.filter(function (el) {
         return (el && "" !== el);
       });
-      this.setState({ [event.target.name]: filteredValue });
-      this.refreshNews();
+      this.setState({ [event.target.name]: filteredValue }, () => {
+        this.refreshNews();
+      });
+    }
+  }
+
+  handleTextChange = event => {
+    if (event.target.value && "" !== event.target.value) {
+      var filteredValue = event.target.value;
+      this.setState({ [event.target.name]: filteredValue }, () => {
+        this.refreshNews();
+      });
     }
   }
 
@@ -148,7 +164,8 @@ class Filter extends React.Component {
         this.state.language,
         this.state.country,
         this.state.category,
-        this.state.source
+        this.state.source,
+        this.state.search
       );
     }
   }
@@ -333,14 +350,33 @@ class Filter extends React.Component {
             <FormHelperText>Preferred categories</FormHelperText>
           </FormControl>
           <FormControl className={classes.formControl}>
-            <SwitchWithLabel 
-              label="Headlines" 
-              onSwitchOn={ this.props.onSwitchToHeadlines } 
-              onSwitchOff={ this.props.onSwitchToEverything } />
-            <SwitchWithLabel 
-              label="Dark" 
-              onSwitchOn={ this.props.onSwitchToDarkMode } 
-              onSwitchOff={ this.props.onSwitchToLightMode } />
+            <TextField
+              id="search"
+              name="search"
+              label="Refine"
+              defaultValue={this.state.search}
+              onChange={this.handleTextChange}
+              className={classes.textField}
+              helperText="Refine article search"
+              margin="normal"
+            />
+          </FormControl>
+          <FormControl className={classes.formControl}>
+            <SwitchesWithLabel 
+              options={[
+                { 
+                  on: true, 
+                  label: "Headlines", 
+                  onSwitchOn: this.props.onSwitchToHeadlines, 
+                  onSwitchOff: this.props.onSwitchToEverything    
+                },
+                { 
+                  on: false, 
+                  label: "Dark", 
+                  onSwitchOn: this.props.onSwitchToDarkMode, 
+                  onSwitchOff:this.props.onSwitchToLightMode  
+                }
+              ]} />
           </FormControl>
         </form>
       </div>
