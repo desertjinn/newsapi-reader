@@ -139,23 +139,29 @@ class Filter extends React.Component {
   }
 
   handleChange = event => {
-    if (event.target.value && "" !== event.target.value) {
-      var filteredValue = event.target.value.filter(function (el) {
-        return (el && "" !== el);
-      });
-      this.setState({ [event.target.name]: filteredValue }, () => {
-        this.refreshNews();
-      });
+    var filteredValue = event.target.value.filter(function (el) {
+      return (el && "" !== el);
+    });
+    if (filteredValue) {
+      this.setState({ [event.target.name]: filteredValue });
     }
   }
 
   handleTextChange = event => {
     if (event.target.value && "" !== event.target.value) {
-      var filteredValue = event.target.value;
-      this.setState({ [event.target.name]: filteredValue }, () => {
-        this.refreshNews();
-      });
+      this.setState({ [event.target.name]: event.target.value });
     }
+  }
+
+  handleKeyPress = event => {
+    if (event.key === 'Enter') {
+      this.refreshNews();
+    }
+  }
+
+  preventFormSubmit = event => {
+    event.preventDefault();
+    return false;
   }
 
   refreshNews() {
@@ -186,6 +192,8 @@ class Filter extends React.Component {
   }
 
   renderCountryOptions() {
+    // the /everything endpoint does not support Countries option. 
+    // TODO: disable the select if headlines is deactivated
     var processedCountries = [];
     var countryMenuItems = [];
     this.state.countries
@@ -250,7 +258,7 @@ class Filter extends React.Component {
     const { classes } = this.props;
     return (
       <div className={classes.formAlignment} id={this.state.id} >
-        <form className={classes.root} autoComplete="off">
+        <form id={this.state.id} className={classes.root} autoComplete="off" onSubmit={this.preventFormSubmit}>
           <FormControl className={classes.formControl}>
             <InputLabel htmlFor="source">Sources</InputLabel>
             <Select
@@ -356,6 +364,7 @@ class Filter extends React.Component {
               label="Refine"
               defaultValue={this.state.search}
               onChange={this.handleTextChange}
+              onKeyPress={this.handleKeyPress}
               className={classes.textField}
               helperText="Refine article search"
               margin="normal"
